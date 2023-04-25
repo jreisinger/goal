@@ -26,7 +26,7 @@ func main() {
 
 	goals, err := goal.Parse(*dir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "parsing yaml files in %s: %v", *dir, err)
+		fmt.Fprintf(os.Stderr, "parsing yaml files in %s: %v\n", *dir, err)
 		os.Exit(1)
 	}
 	goal.Print(os.Stdout, goals)

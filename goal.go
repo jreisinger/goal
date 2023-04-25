@@ -49,7 +49,7 @@ func Parse(dir string) (map[string]Goal, error) {
 			}
 			g, err := parse(b)
 			if err != nil {
-				return err
+				return fmt.Errorf("parsing %s: %w", entry.Name(), err)
 			}
 			goals[path] = g
 
