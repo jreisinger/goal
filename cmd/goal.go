@@ -30,5 +30,5 @@ func main() {
 		fmt.Fprintf(os.Stderr, "parsing yaml files in %s: %v\n", *dir, err)
 		os.Exit(1)
 	}
-	goal.Print(os.Stdout, goals, *all)
+	goal.Print(goals, *all)
 }

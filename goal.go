@@ -168,7 +168,7 @@ func (t Tactic) isDone() bool {
 	return false // should never get here
 }
 
-func Print(w io.Writer, goals map[string]Goal, all bool) {
+func Print(goals map[string]Goal, all bool) {
 	// const format = "%v\t%v\n"
 	// tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
 	// fmt.Fprintf(tw, format, "Goal", "Status")
@@ -180,18 +180,18 @@ func Print(w io.Writer, goals map[string]Goal, all bool) {
 
 	for _, k := range sortKeys(goals) {
 		fmt.Println()
-		fmt.Fprintln(w, k)
+		fmt.Println(k)
 		g := goals[k]
 		for _, t := range g.Tactics {
 			if !all && t.isDone() {
 				continue
 			}
 			if t.isDone() {
-				fmt.Fprint(w, "✅ ")
-				fmt.Fprintln(w, t)
+				fmt.Print("✅ ")
+				fmt.Println(t)
 			} else {
-				fmt.Fprint(w, "   ")
-				fmt.Fprintln(w, t)
+				fmt.Print("-  ")
+				fmt.Println(t)
 			}
 		}
 	}
