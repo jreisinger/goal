@@ -12,23 +12,24 @@ import (
 
 var (
 	home, _ = os.UserHomeDir()
-	all     = flag.Bool("all", false, "print all tactics")
-	dir     = flag.String("dir", filepath.Join(home, "goal"), "directory holding yaml files")
-	example = flag.Bool("example", false, "print example yaml file content and exit")
+
+	d = flag.String("d", filepath.Join(home, "goal"), "directory holding yaml files")
+	e = flag.Bool("e", false, "print example yaml file content and exit")
+	v = flag.Bool("v", false, "be verbose")
 )
 
 func main() {
 	flag.Parse()
 
-	if *example {
+	if *e {
 		fmt.Println(goal.Example())
 		os.Exit(0)
 	}
 
-	goals, err := goal.Parse(*dir)
+	goals, err := goal.Parse(*d)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "parsing yaml files in %s: %v\n", *dir, err)
+		fmt.Fprintf(os.Stderr, "parsing yaml files in %s: %v\n", *d, err)
 		os.Exit(1)
 	}
-	goal.Print(goals, *all)
+	goal.Print(goals, *v)
 }

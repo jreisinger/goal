@@ -8,9 +8,9 @@ Have you ever seen someone, for example you :-), being or at least appearing bus
 $ go install cmd/goal.go
 
 $ mkdir ~/goal
-$ goal -example > ~/goal/karate.yaml
+$ goal -e > ~/goal/karate.yaml
 
-$ goal -all
+$ goal -v
 
 /Users/jozef/goal/karate.yaml
 -  Find an online community to share ideas and get tips. (done: 0001-01-01, interval: once)

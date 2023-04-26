@@ -85,10 +85,6 @@ type Tactic struct {
 	Interval Interval  `yaml:"interval,omitempty"` // defaults to once
 }
 
-func (t Tactic) String() string {
-	return fmt.Sprintf("%s (done: %s, interval: %s)", t.Do, &t.Done, t.Interval)
-}
-
 // Parse recursively parses files in dir into name and goal map. Name is the
 // path of YAML file holding a goal.
 func Parse(dir string) (map[string]Goal, error) {
@@ -167,8 +163,23 @@ func (t Tactic) isDone() bool {
 	}
 	return false // should never get here
 }
+func printTactic(t Tactic, verbose bool) {
+	if !verbose && t.isDone() {
+		return
+	}
+	if t.isDone() {
+		fmt.Print("✅ ")
+	} else {
+		fmt.Print("-  ")
+	}
+	fmt.Printf("%s", t.Do)
+	if verbose {
+		fmt.Printf(" (done: %s, interval: %s)", &t.Done, t.Interval)
+	}
+	fmt.Println()
+}
 
-func Print(goals map[string]Goal, all bool) {
+func Print(goals map[string]Goal, verbose bool) {
 	// const format = "%v\t%v\n"
 	// tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
 	// fmt.Fprintf(tw, format, "Goal", "Status")
@@ -183,16 +194,7 @@ func Print(goals map[string]Goal, all bool) {
 		fmt.Println(k)
 		g := goals[k]
 		for _, t := range g.Tactics {
-			if !all && t.isDone() {
-				continue
-			}
-			if t.isDone() {
-				fmt.Print("✅ ")
-				fmt.Println(t)
-			} else {
-				fmt.Print("-  ")
-				fmt.Println(t)
-			}
+			printTactic(t, verbose)
 		}
 	}
 }
