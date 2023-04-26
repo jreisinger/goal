@@ -181,7 +181,7 @@ func printTactic(t Tactic, verbose bool) {
 	if t.isDone() {
 		fmt.Print("✅ ")
 	} else {
-		fmt.Print("-  ")
+		fmt.Print("👉 ")
 	}
 	fmt.Printf("%s", t.Do)
 	if verbose {
@@ -207,17 +207,20 @@ func Print(goals []Goal, verbose bool) {
 
 	sortGoals(goals)
 
+	const sep = "--------------------------------------------------------------------------------"
+
 	for i, g := range goals {
-		fmt.Println()
 		fmt.Printf("%s %s", circledNumbers[i+1], g.Path)
 		if verbose {
-			fmt.Printf(" (updated: %s)", &g.Updated)
+			fmt.Printf(" (updated: %s)\n", &g.Updated)
+			fmt.Printf("🏁 %s\n", g.Description)
+			fmt.Printf("🧭 %s", g.Strategy)
 		}
-		fmt.Println()
 		fmt.Println()
 		for _, t := range g.Tactics {
 			printTactic(t, verbose)
 		}
+		fmt.Println(sep)
 	}
 }
 
