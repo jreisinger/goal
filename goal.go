@@ -7,10 +7,25 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"text/tabwriter"
+	"sort"
+	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
+
+const (
+	Once Interval = iota
+	Daily
+	Weekly
+	Monthly
+)
+
+type Interval int
+
+func (i Interval) String() string {
+	return [...]string{"once", "daily", "weekly", "monthly"}[i]
+}
 
 // Goal is where you want to get or what you want to achieve.
 type Goal struct {
@@ -19,10 +34,59 @@ type Goal struct {
 	Tactics     []Tactic // implementation of the strategy
 }
 
+// CivilTime represents time in the format "2006-01-02".
+type CivilTime time.Time
+
+// UnmarshalYAML implements yaml.Unmarshaler so CivilTime can be unmarshaled
+// from a YAML document.
+func (c *CivilTime) UnmarshalYAML(n *yaml.Node) error {
+	value := strings.Trim(string(n.Value), `"`) //get rid of "
+	if value == "" || value == "null" {
+		return nil
+	}
+
+	t, err := time.Parse("2006-01-02", value) //parse time
+	if err != nil {
+		return err
+	}
+	*c = CivilTime(t) //set result using the pointer
+	return nil
+}
+
+func (c *CivilTime) String() string {
+	return time.Time(*c).Format("2006-01-02")
+}
+
+// UnmarshalYAML implements yaml.Unmarshaler so Interval can be unmarshaled from
+// a YAML document.
+func (i *Interval) UnmarshalYAML(n *yaml.Node) error {
+	switch n.Value {
+	case "", "once":
+		*i = Once
+		return nil
+	case "daily":
+		*i = Daily
+		return nil
+	case "weekly":
+		*i = Weekly
+		return nil
+	case "monthly":
+		*i = Monthly
+		return nil
+	default:
+		return fmt.Errorf("unknown interval: %s", n.Value)
+	}
+}
+
 // Tactic defines what to do and whether it's already done.
 type Tactic struct {
-	Do   string
-	Done bool `yaml:"done,omitempty"`
+	Do       string
+	Done     CivilTime `yaml:"done,omitempty"`     // defaults to 0001-01-01
+	Interval Interval  `yaml:"interval,omitempty"` // defaults to once
+}
+
+func (t Tactic) String() string {
+	return fmt.Sprintf("%s (done: %s, interval: %s)", t.Do, &t.Done, t.Interval)
 }
 
 // Parse recursively parses files in dir into name and goal map. Name is the
@@ -69,20 +133,17 @@ func Example() string {
 	return `description: Become a black belt martial artist in under five years.
 strategy: Get a personal trainer and train consistently over the next five years.
 tactics:
-  - do: Find a personal trainer.
-    done: true
-  - do: Set annual, monthly and weekly goals.
-    done: false # can be omitted
-  - do: Have a health/diet plan focused on mind, body and spirit.
-  - do: Develop a series of minor milestones (to stay motivated).
-  - do: Research martial arts instructors in this area.
-  - do: Find a ‘training buddy’.
-  - do: Find an online community to share ideas and get tips.
-  - do: Train on Monday, Tuesday, Thursday and Friday (2 hours per session).
-  - do: Write a diet plan.
-  - do: Buy training equipment for home use.
-  - do: Meditate daily (10 – 30 minutes).
-  - do: Develop a ‘rewards’ scheme for minor milestones achieved.`
+- do: Find an online community to share ideas and get tips.
+  done: 0001-01-01 # can be ommitted
+  interval: once # can be omitted 
+- do: Find a personal trainer.
+- do: Have a health/diet plan focused on mind, body and spirit.
+  done: 1970-01-01
+- do: Meditate daily 10 – 30 minutes.
+  done: 2023-04-25 # will expire in a day because of daily interval
+  interval: daily
+- do: Train on Monday, Tuesday, Thursday and Friday (2 hours per session).
+  interval: weekly`
 }
 
 func parse(yamlData []byte) (Goal, error) {
@@ -93,25 +154,60 @@ func parse(yamlData []byte) (Goal, error) {
 	return goal, nil
 }
 
-// Done returns percentage and number of the steps done out of all the steps.
-func (g Goal) Done() string {
-	var total, done int
-	for _, step := range g.Tactics {
-		total++
-		if step.Done {
-			done++
+func Print(w io.Writer, goals map[string]Goal) {
+	// const format = "%v\t%v\n"
+	// tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
+	// fmt.Fprintf(tw, format, "Goal", "Status")
+	// fmt.Fprintf(tw, format, "----", "------")
+	// for name, g := range goals {
+	// 	fmt.Fprintf(tw, format, name, g.Status())
+	// }
+	// tw.Flush()
+
+	for _, k := range sortKeys(goals) {
+		fmt.Println()
+		fmt.Fprintln(w, k)
+		g := goals[k]
+		for _, t := range g.Tactics {
+			switch t.Interval {
+			case Once:
+				if !time.Time(t.Done).IsZero() {
+					fmt.Fprint(w, "✅ ")
+				} else {
+					fmt.Fprint(w, "   ")
+				}
+				fmt.Fprintln(w, t)
+			case Daily:
+				if time.Since(time.Time(t.Done)) < time.Hour*24 {
+					fmt.Fprint(w, "✅ ")
+				} else {
+					fmt.Fprint(w, "   ")
+				}
+				fmt.Fprintln(w, t)
+			case Weekly:
+				if time.Since(time.Time(t.Done)) < time.Hour*24*7 {
+					fmt.Fprint(w, "✅ ")
+				} else {
+					fmt.Fprint(w, "   ")
+				}
+				fmt.Fprintln(w, t)
+			case Monthly:
+				if time.Since(time.Time(t.Done)) < time.Hour*24*7*30 {
+					fmt.Fprint(w, "✅ ")
+				} else {
+					fmt.Fprint(w, "   ")
+				}
+				fmt.Fprintln(w, t)
+			}
 		}
 	}
-	return fmt.Sprintf("%02.0f%% (%d/%d)", float64(done)/float64(total)*100, done, total)
 }
 
-func Print(w io.Writer, goals map[string]Goal) {
-	const format = "%v\t%v\n"
-	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintf(tw, format, "Goal", "Done")
-	fmt.Fprintf(tw, format, "----", "----")
-	for name, g := range goals {
-		fmt.Fprintf(tw, format, name, g.Done())
+func sortKeys(m map[string]Goal) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
 	}
-	tw.Flush()
+	sort.Strings(keys)
+	return keys
 }

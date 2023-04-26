@@ -1,4 +1,4 @@
-Goal helps you achieve your goals by using strategy and tactics.
+Goal helps you achieve your goals by using strategy and tactics straight from your terminal.
 
 > Strategy without tactics is the slowest route to victory. Tactics without strategy is the noise before defeat. — Sun Tzu.
 
@@ -7,32 +7,19 @@ Have you ever seen someone, for example you :-), being or at least appearing bus
 ```
 $ go install cmd/goal.go
 
-$ goal -example
-description: Become a black belt martial artist in under five years.
-strategy: Get a personal trainer and train consistently over the next five years.
-tactics:
-  - do: Find a personal trainer.
-    done: true
-  - do: Set annual, monthly and weekly goals.
-    done: false # can be omitted
-  - do: Have a health/diet plan focused on mind, body and spirit.
-  - do: Develop a series of minor milestones (to stay motivated).
-  - do: Research martial arts instructors in this area.
-  - do: Find a ‘training buddy’.
-  - do: Find an online community to share ideas and get tips.
-  - do: Train on Monday, Tuesday, Thursday and Friday (2 hours per session).
-  - do: Write a diet plan.
-  - do: Buy training equipment for home use.
-  - do: Meditate daily (10 – 30 minutes).
-  - do: Develop a ‘rewards’ scheme for minor milestones achieved.
-
 $ mkdir ~/goal
 $ goal -example > ~/goal/karate.yaml
 
 $ goal
-Goal                           Done
-----                           ----
-/Users/jozef/goal/karate.yaml  08% (1/12)
+
+/Users/jozef/goal/karate.yaml
+   Find an online community to share ideas and get tips. (done: 0001-01-01, interval: once)
+   Find a personal trainer. (done: 0001-01-01, interval: once)
+✅ Have a health/diet plan focused on mind, body and spirit. (done: 1970-01-01, interval: once)
+   Meditate daily 10 – 30 minutes. (done: 2023-04-25, interval: daily)
+   Train on Monday, Tuesday, Thursday and Friday (2 hours per session). (done: 0001-01-01, interval: weekly)
+
+$ vim /Users/jozef/goal/karate.yaml
 ```
 
 Inspired by the book The Art of Cyber Security by Gary Hibberd.
