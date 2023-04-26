@@ -154,7 +154,21 @@ func parse(yamlData []byte) (Goal, error) {
 	return goal, nil
 }
 
-func Print(w io.Writer, goals map[string]Goal) {
+func (t Tactic) isDone() bool {
+	switch t.Interval {
+	case Once:
+		return !time.Time(t.Done).IsZero()
+	case Daily:
+		return time.Since(time.Time(t.Done)) < time.Hour*24
+	case Weekly:
+		return time.Since(time.Time(t.Done)) < time.Hour*24*7
+	case Monthly:
+		return time.Since(time.Time(t.Done)) < time.Hour*24*7*30
+	}
+	return false // should never get here
+}
+
+func Print(w io.Writer, goals map[string]Goal, all bool) {
 	// const format = "%v\t%v\n"
 	// tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
 	// fmt.Fprintf(tw, format, "Goal", "Status")
@@ -169,34 +183,14 @@ func Print(w io.Writer, goals map[string]Goal) {
 		fmt.Fprintln(w, k)
 		g := goals[k]
 		for _, t := range g.Tactics {
-			switch t.Interval {
-			case Once:
-				if !time.Time(t.Done).IsZero() {
-					fmt.Fprint(w, "✅ ")
-				} else {
-					fmt.Fprint(w, "   ")
-				}
+			if !all && t.isDone() {
+				continue
+			}
+			if t.isDone() {
+				fmt.Fprint(w, "✅ ")
 				fmt.Fprintln(w, t)
-			case Daily:
-				if time.Since(time.Time(t.Done)) < time.Hour*24 {
-					fmt.Fprint(w, "✅ ")
-				} else {
-					fmt.Fprint(w, "   ")
-				}
-				fmt.Fprintln(w, t)
-			case Weekly:
-				if time.Since(time.Time(t.Done)) < time.Hour*24*7 {
-					fmt.Fprint(w, "✅ ")
-				} else {
-					fmt.Fprint(w, "   ")
-				}
-				fmt.Fprintln(w, t)
-			case Monthly:
-				if time.Since(time.Time(t.Done)) < time.Hour*24*7*30 {
-					fmt.Fprint(w, "✅ ")
-				} else {
-					fmt.Fprint(w, "   ")
-				}
+			} else {
+				fmt.Fprint(w, "   ")
 				fmt.Fprintln(w, t)
 			}
 		}

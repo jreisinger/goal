@@ -10,7 +10,7 @@ $ go install cmd/goal.go
 $ mkdir ~/goal
 $ goal -example > ~/goal/karate.yaml
 
-$ goal
+$ goal -all
 
 /Users/jozef/goal/karate.yaml
    Find an online community to share ideas and get tips. (done: 0001-01-01, interval: once)

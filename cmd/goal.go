@@ -12,6 +12,7 @@ import (
 
 var (
 	home, _ = os.UserHomeDir()
+	all     = flag.Bool("all", false, "print all tactics")
 	dir     = flag.String("dir", filepath.Join(home, "goal"), "directory holding yaml files")
 	example = flag.Bool("example", false, "print example yaml file content and exit")
 )
@@ -29,5 +30,5 @@ func main() {
 		fmt.Fprintf(os.Stderr, "parsing yaml files in %s: %v\n", *dir, err)
 		os.Exit(1)
 	}
-	goal.Print(os.Stdout, goals)
+	goal.Print(os.Stdout, goals, *all)
 }
