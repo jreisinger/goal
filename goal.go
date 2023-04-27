@@ -238,6 +238,9 @@ func sortGoals(goals []Goal) {
 		if x.Updated != y.Updated {
 			return time.Time(x.Updated).After(time.Time(y.Updated))
 		}
+		if x.Path != y.Path {
+			return x.Path < y.Path
+		}
 		return false
 	}})
 }
