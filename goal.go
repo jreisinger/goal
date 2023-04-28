@@ -42,16 +42,21 @@ type CivilTime time.Time
 // UnmarshalYAML implements yaml.Unmarshaler so CivilTime can be unmarshaled
 // from a YAML document.
 func (c *CivilTime) UnmarshalYAML(n *yaml.Node) error {
-	value := strings.Trim(string(n.Value), `"`) //get rid of "
-	if value == "" || value == "null" {
+	value := strings.Trim(string(n.Value), `"`) // get rid of "
+	switch value {
+	case "", "null":
 		return nil
+	case "unknown":
+		value = "1970-01-01"
+	case "never":
+		value = "0001-01-01"
 	}
 
 	t, err := time.Parse("2006-01-02", value) //parse time
 	if err != nil {
 		return err
 	}
-	*c = CivilTime(t) //set result using the pointer
+	*c = CivilTime(t) // set result using the pointer
 	return nil
 }
 
@@ -139,19 +144,16 @@ func Parse(dir string) ([]Goal, error) {
 // Example returns sample YAML file content.
 func Example() string {
 	return `description: Become a black belt martial artist in under five years.
-strategy: Get a personal trainer and train consistently over the next five years.
+strategy: Get a personal trainer and train consistently.
 tactics:
-- do: Find an online community to share ideas and get tips.
-  done: 0001-01-01 # can be ommitted
-  interval: once # can be omitted 
 - do: Find a personal trainer.
+  interval: once 	# default, can be omitted
+  done: never 	 	# default, can be ommitted
+- do: Train daily, 2 hours per session.
+  interval: daily  	# or weekly, monthly
+  done: 2023-04-27 	# will expire in a day because of daily interval
 - do: Have a health/diet plan focused on mind, body and spirit.
-  done: 1970-01-01
-- do: Meditate daily 10 – 30 minutes.
-  done: 2023-04-25 # will expire in a day because of daily interval
-  interval: daily
-- do: Train on Monday, Tuesday, Thursday and Friday (2 hours per session).
-  interval: weekly`
+  done: unknown    	# I've done this but don't know the date`
 }
 
 func parse(yamlData []byte) (Goal, error) {
