@@ -10,15 +10,10 @@ $ go install cmd/goal.go
 $ mkdir ~/goal
 $ goal -e > ~/goal/karate.yaml
 
-$ goal -v
-① /Users/jozef/goal/karate.yaml (updated: 2023-04-25)
-🏁 Become a black belt martial artist in under five years.
-🧭 Get a personal trainer and train consistently over the next five years.
-👉 Find an online community to share ideas and get tips. (done: 0001-01-01, interval: once)
-👉 Find a personal trainer. (done: 0001-01-01, interval: once)
-✅ Have a health/diet plan focused on mind, body and spirit. (done: 1970-01-01, interval: once)
-👉 Meditate daily 10 – 30 minutes. (done: 2023-04-25, interval: daily)
-👉 Train on Monday, Tuesday, Thursday and Friday (2 hours per session). (done: 0001-01-01, interval: weekly)
+$ goal
+① /Users/jozef/goal/karate.yaml
+👉 Find a personal trainer. (do: once, done: never)
+👉 Meditate daily 10 – 30 minutes. (do: daily, done: 2d ago)
 
 $ vim /Users/jozef/goal/karate.yaml
 ```

@@ -147,9 +147,9 @@ func Example() string {
 strategy: Get a personal trainer and train consistently.
 tactics:
 - do: Find a personal trainer.
-  interval: once 	# default, can be omitted
+  interval: once  	# default, can be omitted
   done: never 	 	# default, can be ommitted
-- do: Train daily, 2 hours per session.
+- do: Meditate daily 10 – 30 minutes.
   interval: daily  	# or weekly, monthly
   done: 2023-04-27 	# will expire in a day because of daily interval
 - do: Have a health/diet plan focused on mind, body and spirit.
