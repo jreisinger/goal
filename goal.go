@@ -56,7 +56,17 @@ func (c *CivilTime) UnmarshalYAML(n *yaml.Node) error {
 }
 
 func (c *CivilTime) String() string {
-	return time.Time(*c).Format("2006-01-02")
+	t := time.Time(*c)
+	switch {
+	case t.IsZero():
+		return "never"
+	case t.Equal(time.Unix(0, 0)):
+		return "unknown"
+	default:
+		days := time.Since(t).Hours() / 24
+		return fmt.Sprintf("%.0fd ago", days)
+		// return time.Time(*c).Format("2006-01-02")
+	}
 }
 
 // UnmarshalYAML implements yaml.Unmarshaler so Interval can be unmarshaled from
@@ -183,10 +193,7 @@ func printTactic(t Tactic, verbose bool) {
 	} else {
 		fmt.Print("👉 ")
 	}
-	fmt.Printf("%s", t.Do)
-	if verbose {
-		fmt.Printf(" (done: %s, interval: %s)", &t.Done, t.Interval)
-	}
+	fmt.Printf("%s (do: %s, done: %s)", t.Do, t.Interval, &t.Done)
 	fmt.Println()
 }
 
