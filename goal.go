@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -67,10 +68,11 @@ func (c *CivilTime) String() string {
 		return "never"
 	case t.Equal(time.Unix(0, 0)):
 		return "unknown"
+	case t.After(time.Now()):
+		return "time travel, huh?"
 	default:
-		days := time.Since(t).Hours() / 24
-		return fmt.Sprintf("%.0fd ago", days)
-		// return time.Time(*c).Format("2006-01-02")
+		days := time.Since(t).Hours() / 24.0
+		return fmt.Sprintf("%.0fd ago", math.Floor(days))
 	}
 }
 

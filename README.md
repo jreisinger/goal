@@ -13,7 +13,7 @@ $ goal -e > ~/goal/karate.yaml
 $ goal
 ① /Users/jozef/goal/karate.yaml
 👉 Find a personal trainer. (do: once, done: never)
-👉 Meditate daily 10 – 30 minutes. (do: daily, done: 2d ago)
+👉 Meditate daily 10 – 30 minutes. (do: daily, done: 1d ago)
 
 $ vim /Users/jozef/goal/karate.yaml
 ```
