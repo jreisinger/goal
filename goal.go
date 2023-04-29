@@ -150,7 +150,7 @@ strategy: Get a personal trainer and train consistently.
 tactics:
 - do: Find a personal trainer.
   interval: once  	# default, can be omitted
-  done: never 	 	# default, can be ommitted
+  done: never 	 	# default, can be omitted
 - do: Meditate daily 10 – 30 minutes.
   interval: daily  	# or weekly, monthly
   done: 2023-04-27 	# will expire in a day because of daily interval
@@ -246,7 +246,10 @@ func (x customSort) Swap(i, j int)      { x.goals[i], x.goals[j] = x.goals[j], x
 
 func sortGoals(goals []Goal) {
 	sort.Sort(customSort{goals, func(x, y Goal) bool {
-		if x.Updated != y.Updated {
+		if x.Updated != y.Updated &&
+			// I use future times to skip weekends, so ignore them.
+			!(time.Time(x.Updated).After(time.Now()) ||
+				time.Time(y.Updated).After(time.Now())) {
 			return time.Time(x.Updated).After(time.Time(y.Updated))
 		}
 		if x.Path != y.Path {
