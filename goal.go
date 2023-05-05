@@ -246,12 +246,6 @@ func (x customSort) Swap(i, j int)      { x.goals[i], x.goals[j] = x.goals[j], x
 
 func sortGoals(goals []Goal) {
 	sort.Sort(customSort{goals, func(x, y Goal) bool {
-		if x.Updated != y.Updated &&
-			// I use future times to skip weekends, so ignore them.
-			!(time.Time(x.Updated).After(time.Now()) ||
-				time.Time(y.Updated).After(time.Now())) {
-			return time.Time(x.Updated).After(time.Time(y.Updated))
-		}
 		if x.Path != y.Path {
 			return x.Path < y.Path
 		}
