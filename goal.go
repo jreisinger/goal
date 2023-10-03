@@ -184,7 +184,7 @@ func (t Tactic) isDone() bool {
 	case Weekly:
 		return time.Since(time.Time(t.Done)) < time.Hour*24*7
 	case Monthly:
-		return time.Since(time.Time(t.Done)) < time.Hour*24*7*30
+		return time.Since(time.Time(t.Done)) < time.Hour*24*30
 	}
 	return false // should never get here
 }
